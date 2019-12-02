@@ -1,0 +1,90 @@
+{
+  "dataset_reader": {
+    "type": "vua_reader"
+  },
+    "validation_dataset_reader": {
+    "type": "vua_reader"
+  },
+  "evaluate_on_test": true,
+  "train_data_path": "datasets/vua/VUA_formatted_train.csv",
+  "validation_data_path": "datasets/vua/VUA_formatted_val.csv",
+  "test_data_path": "../datasets/vua/VUA_formatted_test.csv",
+  "model": {
+    "type": "metaphore_classifier",
+	"model_sentence_field_embedder": {
+	    "cuda_device": 0,
+        "type": "metaphore_embedder",
+        "use_glove_embedding": true,
+        "use_elmo_embedding": true,
+		"use_verb_index_embedding": true,
+        "verb_index_embedding_dimension" : 50,
+		"use_visual_score_embedding" : true,
+		"elmo": 
+		{
+            "options_file": "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway_5.5B/elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json",
+            "weight_file": "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway_5.5B/elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5",
+			"num_output_representations" : 1
+		},
+      "visual_embedder": 
+		{
+            "pretrained_file": "../embeddings/visual/vua_raw_np_3_nor_vectors8.txt",
+            "embedding_dim": 50,
+            "trainable": true,
+            "padding_index": 0
+		},
+      "glove_embedder": 
+		{
+            "pretrained_file": "../embeddings/glove/glove840B300d.txt",
+            "embedding_dim": 300,
+            "trainable": true,
+            "padding_index": 0
+		}
+    },
+	"input_encoder_dropout": 0.3,
+    "input_classifier_dropout": 0.2,
+	"internal_sentence_encoder": {
+        "type": "lstm",
+        "bidirectional": true,
+        "input_size": 1374,
+        "hidden_size": 300,
+        "num_layers": 1,
+        "dropout": 0.2,
+		"batch_first": true
+    },
+    "linear_attention_feedforward": {
+      "input_dim": 600,
+      "num_layers": 1,
+      "hidden_dims": [1],
+      "activations": ["linear"]
+    },
+	"linear_classifier_feedforward": {
+      "input_dim": 600,
+      "num_layers": 1,
+      "hidden_dims": [2],
+      "activations": ["linear"]
+    }
+  },
+  "iterator": {
+    "type": "bucket",
+    "sorting_keys": [["sentences", "num_tokens"]],
+    "batch_size": 44
+  },
+  "validation_iterator": {
+    "type": "bucket",
+    "sorting_keys": [["sentences", "num_tokens"]],
+    "batch_size": 44
+  },
+  "trainer": {
+    "num_epochs":20,
+    "grad_norm": 50.0,
+    "patience": 20,
+    "cuda_device": 0,
+    "validation_metric": "+f1_metaphore",
+    "shuffle": true,
+    "optimizer": {
+	"type": "sgd",
+        "lr": 0.038,
+        "momentum": 0.9
+    }
+  }
+}

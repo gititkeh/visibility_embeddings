@@ -1,0 +1,2 @@
+File to big to include here (more than 5GB)
+Replace this file with glove840B300d from https://nlp.stanford.edu/projects/glove/

@@ -1,0 +1,35 @@
+﻿Run Docker to create virtual machine:
+----------------------------------------
+docker run -v /home/gititkeh:/home/ --rm -it allennlp/allennlp:latest /bin/bash
+
+Run Training:
+----------------
+-s is the number of splits in cross validation. Default is 10
+-c is the path for the configuration file. Default is configuration/mohx.json
+-g is cuda device. should be -1 if running in machine with no GPU. or Gpu device (as 0) otherwise. Default is 0
+-u is 1 if to shuffle data file before splitting for cross validation, 0 otherwise. Default is 0
+-e is the encoding of the data files. For example, utf-8 or latin-1. Default is utf-8
+Examples: 
+Mohx dataset: sh RunTraining.sh
+TroFi dataset: sh RunTraining.sh -c configuration/trofi.json -u 1
+VUA dataset: sh RunTraining.sh -s 1 -c configuration/vua.json -u 1 -e latin-1
+
+Run Tuning:
+------------------
+
+-s is the number of splits in cross validation. Default is 10
+-c is the path for the configuration file. Default is "configuration/mohx.json"
+-g is cuda device. should be -1 if running in machine with no GPU. or Gpu device (as 0) otherwise. Default is 0
+-u is 1 if to shuffle data file before splitting for cross validation, 0 otherwise. Default is 0
+-f is the field name to tune - full field name in json file splitted with ".". Default is "trainer.optimizer.lr"
+-n is 0 or 1 - is this field dimension size of embedding or not. Default is 0
+-l is the lowest value in tuning range. Default is 0.016
+-h is the highest value in range. Default is 0.016
+-z is the step size. Default is 0.001
+-e is the encoding of data files. For example, 'utf-8' or 'latin-1'. Default is "utf-8"
+
+Examples: Tune learning rate from 0.016 to 0.016 with step size 0.001
+
+Mohx dataset: sh RunTuning.sh
+TroFi dataset: sh RunTuning.sh -c configuration/trofi.json -u 1
+VUA dataset: sh RunTuning.sh -s 1 -c configuration/vua.json -u 1 -e latin-1
